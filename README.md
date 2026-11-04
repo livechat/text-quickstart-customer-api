@@ -187,7 +187,7 @@ curl --fail-with-body --silent --show-error \
 
 ## 3. Equivalent RTM / WebSocket flow
 
-For a fresh demonstration, repeat section 3 to create another new customer; reuse the OAuth agent authorization from section 2. Connect with a WebSocket client, e.g. `wscat`, then send JSON frames. Substitute actual token/IDs in frames; shell variables are not expanded inside interactive input. [RTM endpoint](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#methods)
+For a fresh demonstration, repeat section 2 to create another new customer; reuse the OAuth agent authorization from section 1. Connect with a WebSocket client, e.g. `wscat`, then send JSON frames. Substitute actual token/IDs in frames; shell variables are not expanded inside interactive input. [RTM endpoint](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#methods)
 
 ```bash
 wscat -c "wss://api.livechatinc.com/v3.6/customer/rtm/ws?organization_id=$TEXT_ORGANIZATION_ID"
