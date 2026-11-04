@@ -104,7 +104,7 @@ curl --fail-with-body --silent --show-error \
 export CUSTOMER_TOKEN='COPY_NEW_CUSTOMER_ACCESS_TOKEN_FROM_RESPONSE'
 ```
 
-## 2. HTTP flow
+## 3. HTTP flow
 
 Use the **customer token** and required `organization_id` query parameter. Replace returned IDs before continuing; this demonstration is independent of the RTM flow. [Web API methods and headers](https://platform.text.com/docs/messaging/customer-chat-api#methods)
 
