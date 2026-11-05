@@ -14,7 +14,7 @@ Initially, an Owner/Admin signs in and authorizes the app in a browser. Open the
 https://accounts.livechat.com/?response_type=code&client_id=CLIENT_ID&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback&state=RANDOM_STATE
 ```
 
-Exchange the code on the backend — [authorization code exchange](https://platform.text.com/docs/authorization/oauth-authorization#step-4-exchange-code-for-access-token-and-refresh-token):
+Exchange the code on the backend — [authorization code exchange](https://www.text.com/docs/authentication/oauth-authorization/authorization-code-grant#step-4-exchange-the-code-for-tokens):
 
 ```bash
 export AUTHORIZATION_CODE='CODE_RECEIVED_BY_BACKEND_CALLBACK'
@@ -50,7 +50,7 @@ export REFRESH_TOKEN='COPY_REFRESH_TOKEN_FROM_RESPONSE'
 export TEXT_ORGANIZATION_ID='COPY_ORGANIZATION_ID_FROM_RESPONSE'
 ```
 
-Refresh the agent token before expiry — [refresh token grant](https://platform.text.com/docs/authorization/oauth-authorization#using-the-refresh-token):
+Refresh the agent token before expiry — [refresh token grant](https://www.text.com/docs/authentication/oauth-authorization/authorization-code-grant#using-the-refresh-token):
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -64,11 +64,11 @@ export AGENT_TOKEN='COPY_NEW_ACCESS_TOKEN_FROM_REFRESH_RESPONSE'
 export REFRESH_TOKEN='COPY_REFRESH_TOKEN_FROM_REFRESH_RESPONSE'
 ```
 
-Store tokens securely. Reuse and refresh this authorization across runs; browser interaction is needed again only if authorization expires or is revoked. This shows standard server-side code grant; the [OAuth reference](https://platform.text.com/docs/authorization/oauth-authorization#authorization-code-grant) also documents recommended **PKCE**.
+Store tokens securely. Reuse and refresh this authorization across runs; browser interaction is needed again only if authorization expires or is revoked. This shows standard server-side code grant; the [OAuth reference](https://www.text.com/docs/authentication/oauth-authorization/authorization-code-grant) also documents recommended **PKCE**.
 
 ## 2. Create a new customer
 
-Use the **agent token grant**. Omitting `entity_id` creates a **new customer identity** on each request. [New customer grant](https://platform.text.com/docs/authorization/customer-authorization#agent-token-grant)
+Use the **agent token grant**. Omitting `entity_id` creates a **new customer identity** on each request. [New customer grant](https://www.text.com/docs/authentication/customer-tokens#agent-token-grant)
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -93,7 +93,7 @@ export CUSTOMER_TOKEN='COPY_CUSTOMER_ACCESS_TOKEN_FROM_RESPONSE'
 export CUSTOMER_ID='COPY_ENTITY_ID_FROM_RESPONSE'
 ```
 
-The returned organization must match `TEXT_ORGANIZATION_ID` from the agent token response. Use `CUSTOMER_TOKEN` for chat calls. Retain `CUSTOMER_ID`; to renew a token for the **same customer**, include `entity_id` — [existing customer grant](https://platform.text.com/docs/authorization/customer-authorization#agent-token-grant):
+The returned organization must match `TEXT_ORGANIZATION_ID` from the agent token response. Use `CUSTOMER_TOKEN` for chat calls. Retain `CUSTOMER_ID`; to renew a token for the **same customer**, include `entity_id` — [existing customer grant](https://www.text.com/docs/authentication/customer-tokens#agent-token-grant):
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -106,9 +106,9 @@ export CUSTOMER_TOKEN='COPY_NEW_CUSTOMER_ACCESS_TOKEN_FROM_RESPONSE'
 
 ## 3. HTTP flow
 
-Use the **customer token** and required `organization_id` query parameter. Replace returned IDs before continuing; this demonstration is independent of the RTM flow. [Web API methods and headers](https://platform.text.com/docs/messaging/customer-chat-api#methods)
+Use the **customer token** and required `organization_id` query parameter. Replace returned IDs before continuing; this demonstration is independent of the RTM flow. [Web API methods and headers](https://www.text.com/docs/api/customer-chat/v3.6/index)
 
-**Start a chat** — [`start_chat`](https://platform.text.com/docs/messaging/customer-chat-api#start-chat). `continuous: true` permits starting without an online group. An available agent is needed for an immediate reply.
+**Start a chat** — [`start_chat`](https://www.text.com/docs/api/customer-chat/v3.6/chats/start-chat). `continuous: true` permits starting without an online group. An available agent is needed for an immediate reply.
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -123,7 +123,7 @@ Response: `{"chat_id":"CHAT_ID","thread_id":"THREAD_ID"}`. Save the chat ID:
 export CHAT_ID='COPY_CHAT_ID_FROM_RESPONSE'
 ```
 
-**Send text** — [`send_event`](https://platform.text.com/docs/messaging/customer-chat-api#send-event).
+**Send text** — [`send_event`](https://www.text.com/docs/api/customer-chat/v3.6/events/send-event).
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -134,7 +134,7 @@ curl --fail-with-body --silent --show-error \
 
 Response: `{"event_id":"EVENT_ID"}`.
 
-**Fetch the chat and its latest thread** — [`get_chat`](https://platform.text.com/docs/messaging/customer-chat-api#get-chat).
+**Fetch the chat and its latest thread** — [`get_chat`](https://www.text.com/docs/api/customer-chat/v3.6/chats/get-chat).
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -156,7 +156,7 @@ Response excerpt:
 }
 ```
 
-**End the chat** — [`deactivate_chat`](https://platform.text.com/docs/messaging/customer-chat-api#deactivate-chat) closes the current thread. Its request field is **`id`**. Success: HTTP `200 OK`, no response payload.
+**End the chat** — [`deactivate_chat`](https://www.text.com/docs/api/customer-chat/v3.6/chats/deactivate-chat) closes the current thread. Its request field is **`id`**. Success: HTTP `200 OK`, no response payload.
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -165,7 +165,7 @@ curl --fail-with-body --silent --show-error \
   --data "{\"id\":\"$CHAT_ID\"}"
 ```
 
-For a returning customer, find conversations with [`list_chats`](https://platform.text.com/docs/messaging/customer-chat-api#list-chats):
+For a returning customer, find conversations with [`list_chats`](https://www.text.com/docs/api/customer-chat/v3.6/chats/list-chats):
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -174,7 +174,7 @@ curl --fail-with-body --silent --show-error \
   --data '{}'
 ```
 
-Reuse an active chat. Reopen an inactive one with [`resume_chat`](https://platform.text.com/docs/messaging/customer-chat-api#resume-chat):
+Reuse an active chat. Reopen an inactive one with [`resume_chat`](https://www.text.com/docs/api/customer-chat/v3.6/chats/resume-chat):
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -183,11 +183,11 @@ curl --fail-with-body --silent --show-error \
   --data "{\"chat\":{\"id\":\"$CHAT_ID\"}}"
 ```
 
-`list_chats` returns summaries; `get_chat` returns one thread. Use paginated [`list_threads`](https://platform.text.com/docs/messaging/customer-chat-api#list-threads) for history across threads.
+`list_chats` returns summaries; `get_chat` returns one thread. Use paginated [`list_threads`](https://www.text.com/docs/api/customer-chat/v3.6/chats/list-threads) for history across threads.
 
 ## 3. Equivalent RTM / WebSocket flow
 
-For a fresh demonstration, repeat section 2 to create another new customer; reuse the OAuth agent authorization from section 1. Connect with a WebSocket client, e.g. `wscat`, then send JSON frames. Substitute actual token/IDs in frames; shell variables are not expanded inside interactive input. [RTM endpoint](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#methods)
+For a fresh demonstration, repeat section 2 to create another new customer; reuse the OAuth agent authorization from section 1. Connect with a WebSocket client, e.g. `wscat`, then send JSON frames. Substitute actual token/IDs in frames; shell variables are not expanded inside interactive input. [RTM endpoint](https://www.text.com/docs/api/customer-chat/v3.6/rtm/index#connect-to-the-rtm-api)
 
 ```bash
 wscat -c "wss://api.livechatinc.com/v3.6/customer/rtm/ws?organization_id=$TEXT_ORGANIZATION_ID"
@@ -195,7 +195,7 @@ wscat -c "wss://api.livechatinc.com/v3.6/customer/rtm/ws?organization_id=$TEXT_O
 
 **OUT** means client → server; **IN** means server → client. IN examples are **excerpts**, omitting unrelated fields. Match responses by `request_id`, check `success`, and handle `type: "push"` separately; pushes can interleave with responses.
 
-**Log in within 30 seconds** — [`login`](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#login). The token string includes **`Bearer `**.
+**Log in within 30 seconds** — [`login`](https://www.text.com/docs/api/customer-chat/v3.6/rtm/status#login). The token string includes **`Bearer `**.
 
 OUT:
 
@@ -215,7 +215,7 @@ IN:
 }
 ```
 
-**Start** — [`start_chat`](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#start-chat).
+**Start** — [`start_chat`](https://www.text.com/docs/api/customer-chat/v3.6/rtm/chats#start-chat).
 
 OUT:
 
@@ -235,7 +235,7 @@ IN:
 }
 ```
 
-The [`incoming_chat`](https://platform.text.com/docs/messaging/customer-chat-api/rtm-pushes#incoming_chat) push carries the new chat and thread (excerpt):
+The [`incoming_chat`](https://www.text.com/docs/api/customer-chat/v3.6/rtm/pushes#incoming_chat) push carries the new chat and thread (excerpt):
 
 IN:
 
@@ -251,7 +251,7 @@ IN:
 }
 ```
 
-**Send text** — [`send_event`](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#send-event).
+**Send text** — [`send_event`](https://www.text.com/docs/api/customer-chat/v3.6/rtm/events#send-event).
 
 OUT:
 
@@ -278,7 +278,7 @@ IN:
 }
 ```
 
-An agent reply arrives as an [`incoming_event`](https://platform.text.com/docs/messaging/customer-chat-api/rtm-pushes#incoming_event) push:
+An agent reply arrives as an [`incoming_event`](https://www.text.com/docs/api/customer-chat/v3.6/rtm/pushes#incoming_event) push:
 
 IN:
 
@@ -303,7 +303,7 @@ IN:
 
 The same push also reports customer messages: `author_id` identifies the sender. Deduplicate events by `event.id` when combining pushes with fetched history.
 
-**Fetch the chat** — [`get_chat`](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#get-chat).
+**Fetch the chat** — [`get_chat`](https://www.text.com/docs/api/customer-chat/v3.6/rtm/chats#get-chat).
 
 OUT:
 
@@ -330,7 +330,7 @@ IN:
 }
 ```
 
-**End the chat** — [`deactivate_chat`](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#deactivate-chat).
+**End the chat** — [`deactivate_chat`](https://www.text.com/docs/api/customer-chat/v3.6/rtm/chats#deactivate-chat).
 
 OUT:
 
@@ -344,7 +344,7 @@ IN:
 { "request_id": "5", "action": "deactivate_chat", "type": "response", "success": true, "payload": {} }
 ```
 
-The [`chat_deactivated`](https://platform.text.com/docs/messaging/customer-chat-api/rtm-pushes#chat_deactivated) push confirms the active thread closed:
+The [`chat_deactivated`](https://www.text.com/docs/api/customer-chat/v3.6/rtm/pushes#chat_deactivated) push confirms the active thread closed:
 
 IN:
 
@@ -357,7 +357,7 @@ IN:
 }
 ```
 
-Throughout the authenticated session, **send ping every 15 seconds**; idle connections close after approximately 30 seconds. [Server pinging](https://platform.text.com/docs/messaging/customer-chat-api/rtm-reference#server-pinging)
+Throughout the authenticated session, **send ping every 15 seconds**; idle connections close after approximately 30 seconds. [Server pinging](https://www.text.com/docs/api/customer-chat/v3.6/rtm/index#server-pinging)
 
 OUT:
 
@@ -371,4 +371,4 @@ IN:
 { "request_id": "ping-1", "action": "ping", "type": "response", "success": true }
 ```
 
-Closing the WebSocket only disconnects the client; use `deactivate_chat` to end the thread. Pushes require no registration and have no retries; fetch state again after reconnecting. [RTM pushes](https://platform.text.com/docs/messaging/customer-chat-api/rtm-pushes)
+Closing the WebSocket only disconnects the client; use `deactivate_chat` to end the thread. Pushes require no registration and have no retries; fetch state again after reconnecting. [RTM pushes](https://www.text.com/docs/api/customer-chat/v3.6/rtm/pushes)
